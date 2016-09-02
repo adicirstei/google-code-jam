@@ -10,6 +10,12 @@ let parseHeader (line: string) =
   | [|a;b;c|] -> (int a, int b, int c)
   | _ -> failwith "invalid header"
 
+
+let generateWords pattern =
+  pattern
+
+
+
 let solveTest d len n t =
   sprintf "Case #%d: %d" n (String.length t)
 
