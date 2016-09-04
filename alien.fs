@@ -14,6 +14,23 @@ let parseHeader (line: string) =
 let generateWords pattern =
   pattern
 
+let (|St|_|) (c:string) (s:string) =
+  if s.StartsWith(c) then Some (s.Substring(1))
+  else None
+
+let split (c:char) (s:string) =
+  let i = s.IndexOf(c)
+  if i = -1 then (s, "")
+  else (s.[..(i-1)], s.[(i+1)..])
+
+
+let rec parse s = 
+  match s with
+  | "" -> []
+  | St "(" rest -> 
+    let (a,b) = split ')' rest
+    [ for c in a ->c] :: (parse b)
+  | x -> [x.[0]] :: (parse x.[1..])
 
 
 let solveTest d len n t =
