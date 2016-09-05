@@ -10,10 +10,6 @@ let parseHeader (line: string) =
   | [|a;b;c|] -> (int a, int b, int c)
   | _ -> failwith "invalid header"
 
-
-let generateWords pattern =
-  pattern
-
 let (|St|_|) (c:string) (s:string) =
   if s.StartsWith(c) then Some (s.Substring(1))
   else None
@@ -22,6 +18,12 @@ let split (c:char) (s:string) =
   let i = s.IndexOf(c)
   if i = -1 then (s, "")
   else (s.[..(i-1)], s.[(i+1)..])
+
+let flip f a b = f b a
+let all = List.forall id
+
+let join a b = 
+  a + "\n" + b
 
 
 let rec parse s = 
@@ -33,11 +35,18 @@ let rec parse s =
   | x -> [x.[0]] :: (parse x.[1..])
 
 
-let solveTest d len n t =
-  sprintf "Case #%d: %d" n (String.length t)
 
-let join a b = 
-  a + "\n" + b
+let solveTest dict idx test =
+  let possibleWord =
+    all << (List.map2 (flip List.contains) (parse test))
+
+  let sol = 
+    dict
+    |> List.map (fun s -> [for c in s -> c])
+    |> List.filter possibleWord
+    |> List.length
+  sprintf "Case #%d: %d" idx sol
+
 
 let solve (input:string) = 
   let h::tail = Array.toList (input.Split [|'\n'|])
@@ -45,13 +54,11 @@ let solve (input:string) =
   let (l,d,n) = parseHeader h
   let dict = 
     List.take d tail
-    |> Set.ofList
 
   let tests = List.skip d tail
 
-  Seq.map2 (solveTest dict l) [1..n] tests
+  Seq.map2 (solveTest dict) [1..n] tests
   |> Seq.reduce join
-  
 
 [<EntryPoint>]
 let main _ = 
